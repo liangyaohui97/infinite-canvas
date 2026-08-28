@@ -1,7 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import "antd/dist/reset.css";
-import "streamdown/styles.css";
 import "./styles/globals.css";
 import { RouterProvider } from "react-router-dom";
 
@@ -11,6 +10,17 @@ import { initAnalytics } from "@/lib/analytics";
 import { router } from "@/router";
 
 initAnalytics();
+
+const removeBootLoading = () => window.requestAnimationFrame(() => document.getElementById("app-boot-loading")?.remove());
+let unsubscribeRouter: (() => void) | undefined;
+if (router.state.initialized) removeBootLoading();
+else {
+    unsubscribeRouter = router.subscribe((state) => {
+        if (!state.initialized) return;
+        unsubscribeRouter?.();
+        removeBootLoading();
+    });
+}
 
 document.body.style.fontFamily = '"SF Pro Display","SF Pro Text","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif';
 

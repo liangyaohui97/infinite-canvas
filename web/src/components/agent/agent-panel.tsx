@@ -1,6 +1,7 @@
 import { useState, type PointerEvent as ReactPointerEvent } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
+import "streamdown/styles.css";
 
 import { LocalAgentPanel } from "./local-agent-panel";
 import { canvasThemes } from "@/lib/canvas-theme";

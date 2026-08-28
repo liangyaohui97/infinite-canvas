@@ -123,8 +123,12 @@ function AgentModelControls({ models, model, reasoningEffort, onModelChange, onR
                             <span className="hidden min-w-0 flex-1 truncate text-left @min-[660px]:inline">{current.displayName || current.model}</span>
                             <ChevronUp className="hidden size-3 opacity-50 @min-[660px]:block" />
                         </SelectTrigger>
-                        <SelectContent data-canvas-no-zoom position="popper" side="top" align="start" sideOffset={6} className="z-[1200] w-64 rounded-xl border border-border/70 bg-popover p-1 shadow-xl">
-                            {models.map((item) => <SelectItem key={item.model} value={item.model}>{item.displayName || item.model}</SelectItem>)}
+                        <SelectContent data-canvas-no-zoom position="popper" side="top" align="start" sideOffset={8} collisionPadding={8} className="z-[1200] w-max min-w-[min(16rem,calc(100vw-16px))] max-w-[min(30rem,calc(100vw-16px))] rounded-xl bg-popover p-1 shadow-md ring-1 ring-foreground/20">
+                            {models.map((item) => (
+                                <SelectItem key={item.model} value={item.model} title={item.displayName || item.model} className="min-h-9 py-1.5">
+                                    <span className="block max-w-[26rem] whitespace-normal break-words leading-5 [overflow-wrap:anywhere]">{item.displayName || item.model}</span>
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </span>
@@ -137,7 +141,7 @@ function AgentModelControls({ models, model, reasoningEffort, onModelChange, onR
                             <span className="hidden @min-[660px]:inline">{effortLabel(reasoningEffort)}</span>
                             <ChevronUp className="hidden size-3 opacity-50 @min-[660px]:block" />
                         </SelectTrigger>
-                        <SelectContent data-canvas-no-zoom position="popper" side="top" align="start" sideOffset={6} className="z-[1200] min-w-32 rounded-xl border border-border/70 bg-popover p-1 shadow-xl">
+                        <SelectContent data-canvas-no-zoom position="popper" side="top" align="start" sideOffset={8} collisionPadding={8} className="z-[1200] min-w-32 rounded-xl bg-popover p-1 shadow-md ring-1 ring-foreground/20">
                             {current.supportedReasoningEfforts.map((item) => <SelectItem key={item.reasoningEffort} value={item.reasoningEffort}>{effortLabel(item.reasoningEffort)}</SelectItem>)}
                         </SelectContent>
                     </Select>
