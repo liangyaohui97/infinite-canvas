@@ -1,19 +1,15 @@
+import type { ComponentType } from "react";
 import { createBrowserRouter, Outlet } from "react-router-dom";
 
 import { AnalyticsTracker } from "@/components/layout/analytics-tracker";
+import { GlobalLoading } from "@/components/layout/global-loading";
 import UserLayout from "@/layouts/user-layout";
-import AssetsPage from "@/pages/assets";
-import CanvasPage from "@/pages/canvas";
-import CanvasProjectPage from "@/pages/canvas/project";
-import ConfigPage from "@/pages/config";
-import HomePage from "@/pages/home";
-import ImagePage from "@/pages/image";
-import NotFound from "@/pages/not-found";
-import PromptsPage from "@/pages/prompts";
-import VideoPage from "@/pages/video";
+
+const lazyPage = (loader: () => Promise<{ default: ComponentType }>) => async () => ({ Component: (await loader()).default });
 
 export const router = createBrowserRouter([
     {
+        HydrateFallback: GlobalLoading,
         element: (
             <UserLayout>
                 <AnalyticsTracker />
@@ -21,15 +17,15 @@ export const router = createBrowserRouter([
             </UserLayout>
         ),
         children: [
-            { path: "/", element: <HomePage /> },
-            { path: "/image", element: <ImagePage /> },
-            { path: "/video", element: <VideoPage /> },
-            { path: "/assets", element: <AssetsPage /> },
-            { path: "/prompts", element: <PromptsPage /> },
-            { path: "/canvas", element: <CanvasPage /> },
-            { path: "/canvas/:id", element: <CanvasProjectPage /> },
-            { path: "/config", element: <ConfigPage /> },
+            { path: "/", lazy: lazyPage(() => import("@/pages/home")) },
+            { path: "/image", lazy: lazyPage(() => import("@/pages/image")) },
+            { path: "/video", lazy: lazyPage(() => import("@/pages/video")) },
+            { path: "/assets", lazy: lazyPage(() => import("@/pages/assets")) },
+            { path: "/prompts", lazy: lazyPage(() => import("@/pages/prompts")) },
+            { path: "/canvas", lazy: lazyPage(() => import("@/pages/canvas")) },
+            { path: "/canvas/:id", lazy: lazyPage(() => import("@/pages/canvas/project")) },
+            { path: "/config", lazy: lazyPage(() => import("@/pages/config")) },
         ],
     },
-    { path: "*", element: <NotFound /> },
+    { path: "*", lazy: lazyPage(() => import("@/pages/not-found")) },
 ]);

@@ -128,6 +128,15 @@ const NODE_STATUS_IDLE = "idle" as const;
 const NODE_STATUS_LOADING = "loading" as const;
 const NODE_STATUS_SUCCESS = "success" as const;
 const NODE_STATUS_ERROR = "error" as const;
+
+function findAvailableTextResultPosition(initial: Position, size: { width: number; height: number }, nodes: CanvasNodeData[]) {
+    const position = { ...initial };
+    while (nodes.some((node) => node.position.x < position.x + size.width && node.position.x + node.width > position.x && node.position.y < position.y + size.height && node.position.y + node.height > position.y)) {
+        position.y += size.height + 24;
+    }
+    return position;
+}
+
 export default function CanvasPage() {
     const [mounted, setMounted] = useState(false);
 
@@ -2423,12 +2432,19 @@ function InfiniteCanvasPage() {
                 const parentPosition = sourceNode?.position || { x: 0, y: 0 };
                 const isEmptyTextNode = sourceNode?.type === CanvasNodeType.Text && !sourceTextContent;
                 const rootId = isEmptyTextNode ? nodeId : nanoid();
+                const rootPosition = isEmptyTextNode
+                    ? sourceNode.position
+                    : findAvailableTextResultPosition(
+                          { x: parentPosition.x + parentConfig.width + 96, y: parentPosition.y + parentConfig.height / 2 - textConfig.height / 2 },
+                          textConfig,
+                          nodesRef.current,
+                      );
                 const textIds = Array.from({ length: textCount }, () => nanoid());
                 const rootNode: CanvasNodeData = {
                     id: rootId,
                     type: CanvasNodeType.Text,
                     title: effectivePrompt.slice(0, 32) || "Generated Text",
-                    position: isEmptyTextNode ? sourceNode.position : { x: parentPosition.x + parentConfig.width + 96, y: parentPosition.y + parentConfig.height / 2 - textConfig.height / 2 },
+                    position: rootPosition,
                     width: isEmptyTextNode ? sourceNode.width : textConfig.width,
                     height: isEmptyTextNode ? sourceNode.height : textConfig.height,
                     metadata: {

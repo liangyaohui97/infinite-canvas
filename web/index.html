@@ -14,9 +14,35 @@
                 document.documentElement.style.colorScheme = t;
             } catch (e) {}
         </script>
+        <style>
+            #app-boot-loading { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: #fff; color: #1c1917; font-family: "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif; }
+            .dark #app-boot-loading { background: #1c1917; color: #f5f5f4; }
+            .app-boot-content { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+            .app-boot-mark { font-size: 40px; font-weight: 300; line-height: 1; animation: app-boot-pulse 1.2s ease-in-out infinite; }
+            .app-boot-label { color: #57534e; font-size: 14px; }
+            .dark .app-boot-label { color: #d6d3d1; }
+            .app-boot-track { width: 96px; height: 2px; overflow: hidden; background: #e7e5e4; }
+            .dark .app-boot-track { background: #44403c; }
+            .app-boot-progress { display: block; width: 50%; height: 100%; background: currentColor; animation: app-boot-progress 1.2s ease-in-out infinite alternate; }
+            @keyframes app-boot-pulse { 50% { opacity: 0.45; } }
+            @keyframes app-boot-progress { from { transform: translateX(-100%); } to { transform: translateX(200%); } }
+            @media (prefers-reduced-motion: reduce) { .app-boot-mark, .app-boot-progress { animation: none; } }
+        </style>
     </head>
     <body class="bg-background text-foreground antialiased">
         <div id="root"></div>
+        <div id="app-boot-loading" role="status" aria-live="polite">
+            <div class="app-boot-content">
+                <span class="app-boot-mark" aria-hidden="true">∞</span>
+                <span id="app-boot-label" class="app-boot-label">正在加载工作区…</span>
+                <span class="app-boot-track" aria-hidden="true"><span class="app-boot-progress"></span></span>
+            </div>
+        </div>
+        <script>
+            try {
+                if (localStorage.getItem("infinite-canvas:locale") === "en-US") document.getElementById("app-boot-label").textContent = "Loading workspace…";
+            } catch (e) {}
+        </script>
         <script src="/config.js"></script>
         <script type="module" src="/src/main.tsx"></script>
     </body>

@@ -2,6 +2,7 @@ import axios, { type AxiosRequestConfig } from "axios";
 
 import i18n from "@/i18n";
 import { buildApiUrl, type AiConfig, type ModelCapability } from "@/stores/use-config-store";
+import { proxyApiUrl } from "./api-proxy";
 
 type RequestOptions = { signal?: AbortSignal };
 
@@ -38,7 +39,11 @@ function pluginHeaders(extra?: Record<string, string>, hasJsonBody = false): Rec
 }
 
 function pluginUrl(config: AiConfig, path: string) {
-    if (/^https?:/i.test(path)) return path;
+    if (/^https?:/i.test(path)) {
+        const baseUrl = config.baseUrl.trim().replace(/\/+$/, "");
+        const normalizedPath = /\/v\d+(?:beta)?$/i.test(baseUrl) && path.startsWith(`${baseUrl}/`) ? path.replace(new RegExp(`^${baseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/v\\d+(?:beta)?(?=/|$)`, "i"), baseUrl) : path;
+        return proxyApiUrl(normalizedPath);
+    }
     return buildApiUrl(config.baseUrl, path.startsWith("/") ? path : `/${path}`);
 }
 

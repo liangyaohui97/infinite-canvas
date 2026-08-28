@@ -1,4 +1,5 @@
 import localforage from "localforage";
+import { proxyRemoteApiUrl } from "@/services/api/api-proxy";
 
 import { nanoid } from "nanoid";
 import i18n from "@/i18n";
@@ -68,7 +69,7 @@ async function fetchImageBlob(url: string, options?: ImageReadOptions) {
         controller.abort();
     }, IMAGE_DOWNLOAD_TIMEOUT_MS);
     try {
-        const response = await fetch(url, { signal: controller.signal });
+        const response = await fetch(proxyRemoteApiUrl(url), { signal: controller.signal });
         if (!response.ok) throw namedError(IMAGE_RESPONSE_ERROR);
         return await response.blob();
     } catch (error) {

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { modelOptionLabel, modelOptionName, selectableModelsByCapability, type AiConfig, type ModelCapability } from "@/stores/use-config-store";
+import { decodeChannelModel, modelOptionLabel, modelOptionName, selectableModelsByCapability, type AiConfig, type ModelCapability } from "@/stores/use-config-store";
 
 type ModelPickerProps = {
     config: AiConfig;
@@ -61,17 +61,18 @@ export function ModelPicker({ config, value, onChange, capability, className, fu
             </SelectTrigger>
             <SelectContent
                 data-canvas-no-zoom
-                className="z-[1200] w-80 max-w-[calc(100vw-24px)] rounded-xl border border-border/70 bg-popover p-1 shadow-xl"
+                className="z-[1200] w-max min-w-[min(20rem,calc(100vw-16px))] max-w-[min(30rem,calc(100vw-16px))] rounded-xl bg-popover p-1 shadow-md ring-1 ring-foreground/20"
                 position="popper"
                 align="start"
                 side="bottom"
-                sideOffset={6}
+                sideOffset={8}
+                collisionPadding={8}
                 onPointerDown={(event) => event.stopPropagation()}
                 onMouseDown={(event) => event.stopPropagation()}
             >
                 {options.length ? (
                     options.map((model) => (
-                        <SelectItem key={model} value={model} textValue={modelOptionLabel(config, model)}>
+                        <SelectItem key={model} value={model} textValue={modelOptionLabel(config, model)} title={modelOptionLabel(config, model)} className="min-h-11 py-1.5">
                             <ModelLabel config={config} model={model} />
                         </SelectItem>
                     ))
@@ -92,10 +93,15 @@ function emptyModelLabel(config: AiConfig, capability?: ModelCapability) {
 }
 
 function ModelLabel({ config, model }: { config: AiConfig; model: string }) {
+    const decoded = decodeChannelModel(model);
+    const channel = decoded ? config.channels.find((item) => item.id === decoded.channelId) : undefined;
     return (
-        <span className="flex min-w-0 items-center gap-2">
+        <span className="flex min-w-0 flex-1 items-center gap-2">
             <ModelIcon model={model} />
-            <span className="truncate">{modelOptionLabel(config, model)}</span>
+            <span className="min-w-0 flex-1 text-left">
+                <span className="block whitespace-normal break-words leading-5 [overflow-wrap:anywhere]">{decoded?.model || model}</span>
+                {channel ? <span className="block whitespace-normal break-words text-xs leading-4 text-muted-foreground [overflow-wrap:anywhere]">{channel.name}</span> : null}
+            </span>
         </span>
     );
 }
